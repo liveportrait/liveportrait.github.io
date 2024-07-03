@@ -1,0 +1,446 @@
+
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<!-- Title -->
+<title>Efficient Portrait Animation with Stitching and Retargeting Control</title>
+<link href="./src/css/style.css" rel="stylesheet">
+<link rel="stylesheet" href="./src/css/bulma.min.css">
+<link rel="stylesheet" href="./src/css/bulma-carousel.min.css">
+<link rel="stylesheet" href="./src/css/index.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="./src/js/bulma-carousel.min.js"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<script src="./src/js/index.js"></script>
+</head>
+
+<!-- Author -->
+<body>
+<div class="content">
+  <!-- <h1><span><img src="./src/img/live-portrait.png" style="height: 72px;"></span><strong> :<br>Efficient Portrait Animation with Stitching and Retargeting Control</strong></h1> -->
+  <h1><strong>LivePortrait: Efficient Portrait Animation with Stitching and Retargeting Control</strong></h1>
+  <div class="gallery" style="margin-bottom: 0;">
+    <div class="row" style="justify-content: space-evenly; padding: 0; margin-bottom: 0;">
+      <figure style="width: 100%;margin: 0 0; text-align: center;">
+        <figcaption style="text-align: center;"><a href="https://scholar.google.com/citations?user=W8_JzNcAAAAJ" target="_blank" style="text-decoration: none">
+          <strong>Jianzhu Guo</strong></a><sup> 1*</sup></figcaption>
+      </figure>
+      <figure style="width: 100%;margin: 0 0; text-align: center;">
+        <figcaption style="text-align: center;"><a href="https://github.com/KwaiVGI" target="_blank" style="text-decoration: none">
+          <strong>Dingyun Zhang</strong></a><sup> 1,2</sup></figcaption>
+      </figure>
+      <figure style="width: 100%; margin: 0 0; text-align: center;">
+      <figcaption style="text-align: center;"><a href="https://github.com/KwaiVGI" target="_blank" style="text-decoration: none">
+        <strong>Xiaoqiang Liu</strong></a><sup> 1</sup></figcaption>
+      </figure>
+      <figure style="width: 100%; margin: 0 0; text-align: center;">
+      <figcaption style="text-align: center;"><a href="https://github.com/KwaiVGI" target="_blank" style="text-decoration: none">
+        <strong>Zhizhou Zhong</strong></a><sup> 1,3</sup></figcaption>
+      </figure>
+      <figure style="width: 100%; margin: 0 0; text-align: center;">
+        <figcaption style="text-align: center;"><a href="https://scholar.google.com.hk/citations?user=_8k1ubAAAAAJ" target="_blank" style="text-decoration: none">
+          <strong>Yuan Zhang</strong></a><sup> 1</sup></figcaption>
+        </figure>
+      <figure style="width: 100%; margin: 0 0; text-align: center;">
+      <figcaption style="text-align: center;"><a href="https://scholar.google.com/citations?hl=en&user=P6MraaYAAAAJ" target="_blank" style="text-decoration: none">
+        <strong>Pengfei Wan</strong></a> <sup> 1 </sup></figcaption>
+      </figure>
+      <figure style="width: 100%; margin: 0 0; text-align: center;">
+        <figcaption style="text-align: center;"><a href="https://openreview.net/profile?id=~Di_ZHANG3" target="_blank" style="text-decoration: none">
+          <strong>Di Zhang</strong></a> <sup> 1 </sup></figcaption>
+        </figure>
+    </div>
+  </div>
+  <p id="authors" style="margin-top: 5px;">
+      <span style="font-size: 13px; margin-top: 0;">
+        <sup>1</sup> Kuaishou Technology &nbsp;&nbsp;
+        <sup>2</sup> University of Science and Technology of China &nbsp;&nbsp;
+        <sup>3</sup> Fudan University <br>
+        <sup>*</sup> Corresponding author
+      </span>
+    </p>
+  <div style="text-align: center;">
+    <a target="_blank" href="https://www.kuaishou.com/">
+      <img src="./src/img/kwai2.png" alt="Institution" style="width: auto; height: 36px;">
+    </a><br><br>
+  </div>
+  <font style="font-size: 1.3em;">
+    <div style="text-align: center; display: flex; justify-content: center; gap: 40px;">
+
+      <a target="_blank", href="">
+        <div style="display: flex; align-items: center;">
+          <img src="./src/img/th.png" alt="arXiv" style="width: 18px;">
+          <span>[Paper]</span>
+        </div>
+      </a>
+
+      <a target="_blank", href="https://github.com/KwaiVGI/LivePortrait">
+        <div style="display: flex; align-items: center;">
+          <img src="./src/img/github.png" alt="github" style="width: 18px;">
+          <span>[Code]</span>
+        </div>
+      </a>
+
+      <!-- <a target="_blank", href="">
+        <div style="display: flex; align-items: center;">
+          <img src="./src/img/bilibili.ico" alt="bilibili" style="width: 18px;">
+          <span>[Bilibili]</span>
+        </div>
+      </a> -->
+
+      <!-- <a target="_blank", href="">
+        <div style="display: flex; align-items: center;">
+          <img src="./src/img/youtube.png" alt="YouTube" style="width: 18px;">
+          <span>[YouTube]</span>
+        </div>
+      </a> -->
+
+    </div>
+
+  </font>
+</div>
+
+<div class="content">
+  <h3 style="text-align:center"><strong>Comparisons with exsiting methods</strong></h3>
+
+  <style>
+    #dollyzoom {
+      border: none;
+      margin: 0;
+      padding: 0;
+      display: block;
+      clip-path: inset(1px);  /* 裁剪视频的边缘1个像素 */
+    }
+  </style>
+
+  <h4>Self-reenactment</h3>
+  <video id="dollyzoom" autoplay controls muted loop height="50%" style="border: none; margin: 0; padding: 0; display: block; outline: none;">
+    <source src="./src/video/all_self_opt.mp4" type="video/mp4">
+  </video><br>
+  <p style="text-align: center; font-size: smaller;">
+    The results of our first-stage base model, without applying the stitching and retargeting modules, are presented here.
+  </p>
+
+  <br><br>
+  <h4>Cross-reenactment</h4>
+  <video id="dollyzoom" autoplay controls muted loop height="50%" style="border: none; margin: 0; padding: 0; display: block;">
+    <source src="./src/video/all_cross_opt.mp4" type="video/mp4">
+  </video><br>
+  <p style="text-align: center; font-size: smaller;">
+    The results of our first-stage base model are presented in <code>Ours w/o stitching</code>, while <code>Ours</code> shows the results with the stitching module applied.
+  </p>
+
+  <br><br>
+  <h4>Radar Comparisons</h4>
+  <video id="dollyzoom" autoplay controls muted loop height="50%" style="border: none; margin: 0; padding: 0; display: block;">
+    <source src="./src/video/video_c_opt.mp4" type="video/mp4">
+  </video><br>
+  <p style="text-align: center; font-size: smaller;">
+    The quantitative radar comparisons with existing methods are presented as follows, with metrics normalized for better visualization.
+  </p>
+</div>
+
+<div class="content">
+  <h3 style="text-align:center"><strong>Portrait animation from a still image with stitching</strong></h3>
+  <p style="text-align: center; font-size: medium;">Across various styles (realistic, oil painting, sculpture, 3d rendering) and different sizes</p>
+
+  <style>
+    #tree {
+      border: none;
+      margin: 0;
+      padding: 0;
+      display: block;
+      clip-path: inset(1px);  /* 裁剪视频的边缘1个像素 */
+    }
+  </style>
+
+  <div id="carousel" class="carousel carousel-vid" style="overflow: hidden; margin-top: 0px; font-weight: bold; font-size: 1.2em">
+
+    <div class="vid-txt">
+      <video poster="" id="tree" autoplay controls muted loop>
+        <source src="./src/video/image_animation_0_opt.mp4" type="video/mp4">
+      </video>
+    </div>
+    <div class="vid-txt">
+      <video poster="" id="tree" autoplay controls muted loop width="100%">
+        <source src="./src/video/image_animation_1_opt.mp4" type="video/mp4">
+      </video>
+    </div>
+    <div class="vid-txt">
+      <video poster="" id="tree" autoplay controls muted loop width="100%">
+        <source src="./src/video/image_animation_3_opt.mp4" type="video/mp4">
+      </video>
+    </div>
+    <div class="vid-txt">
+      <video poster="" id="tree" autoplay controls muted loop width="100%">
+        <source src="./src/video/image_animation_4_opt.mp4" type="video/mp4">
+      </video>
+    </div>
+    <div class="vid-txt">
+      <video poster="" id="tree" autoplay controls muted loop width="100%">
+        <source src="./src/video/image_animation_5_opt.mp4" type="video/mp4">
+      </video>
+    </div>
+    <div class="vid-txt">
+      <video poster="" id="tree" autoplay controls muted loop width="100%">
+        <source src="./src/video/image_animation_8_opt.mp4" type="video/mp4">
+      </video>
+    </div>
+    <div class="vid-txt">
+      <video poster="" id="tree" autoplay controls muted loop width="100%">
+        <source src="./src/video/image_animation_9_opt.mp4" type="video/mp4">
+      </video>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+  <h3 style="text-align:center"><strong>Portrait video editing with stitching</strong></h3>
+  <p style="text-align:center; font-size: medium;">All source videos are generated from a single image by <a href="https://kling.kuaishou.com/en"><strong>Kling</strong></a></p>
+
+  <style>
+    #tree {
+      border: none;
+      margin: 0;
+      padding: 0;
+      display: block;
+      clip-path: inset(1px);  /* 裁剪视频的边缘1个像素 */
+    }
+  </style>
+
+  <div id="carousel" class="carousel carousel-vid" style="overflow: hidden; margin-top: 0px; font-weight: bold; font-size: 1.2em">
+    <div class="vid-txt">
+      <video poster="" id="tree" autoplay controls muted loop width="100%">
+        <source src="./src/video/video_animation_6_opt.mp4" type="video/mp4">
+      </video>
+    </div>
+    <div class="vid-txt">
+      <video poster="" id="tree" autoplay controls muted loop width="100%">
+        <source src="./src/video/video_animation_4_opt.mp4" type="video/mp4">
+      </video>
+    </div>
+    <div class="vid-txt">
+      <video poster="" id="tree" autoplay controls muted loop width="100%">
+        <source src="./src/video/video_animation_1_opt.mp4" type="video/mp4">
+      </video>
+    </div>
+    <div class="vid-txt">
+      <video poster="" id="tree" autoplay controls muted loop width="100%">
+        <source src="./src/video/video_animation_3_opt.mp4" type="video/mp4">
+      </video>
+    </div>
+    <div class="vid-txt">
+      <video poster="" id="tree" autoplay controls muted loop width="100%">
+        <source src="./src/video/video_animation_0_opt.mp4" type="video/mp4">
+      </video>
+    </div>
+  </div>
+</div>
+
+<!-- Retargeting Part -->
+<div class="content">
+  <h3 style="text-align:center"><strong>Eyes and lip retargeting</strong></h3>
+  <div class="columns is-centered">
+
+    <!-- Eyes retargeting. -->
+    <div class="column"> <br>
+        <h5 style="text-align:center; font-size: medium;">Control the eyes-open extent conditioned on a given scalar</h5>
+        <div class="columns is-vcentered interpolation-panel-eyes">
+          <div class="column is-3 has-text-centered">
+            <img src="./src/img/retargeting_eyes.jpg" class="interpolation-image" alt="Interpolate start reference image." style="width: 144px;" />
+            <p style="text-align: center;">Source</p>
+          </div>
+          <div class="column interpolation-video-column">
+            <div id="interpolation-image-wrapper-eyes">
+              Loading...
+            </div>
+            <input class="slider is-fullwidth is-large is-info" id="interpolation-slider-eyes" step="1" min="0" max="100"
+              value="0" type="range">
+          </div>
+        </div>
+    </div>
+    <!--/ Eyes retargeting. -->
+
+    <!-- Eyes retargeting. -->
+    <div class="column"> <br>
+      <h5 style="text-align:center; font-size: medium;">Control the lip-open extent conditioned on a given scalar</h5>
+        <div class="columns is-vcentered interpolation-panel-lip">
+          <div class="column is-3 has-text-centered">
+            <img src="./src/img/retargeting_lip.jpg" class="interpolation-image" alt="Interpolate start reference image." style="width: 144px;" />
+            <p style="text-align: center;">Source</p>
+          </div>
+          <div class="column interpolation-video-column">
+            <div id="interpolation-image-wrapper-lip">
+              Loading...
+            </div>
+            <input class="slider is-fullwidth is-large is-info" id="interpolation-slider-lip" step="1" min="0" max="100"
+              value="0" type="range">
+          </div>
+        </div>
+      </div>
+    </div>
+
+  <div class="columns is-centered">
+    <!-- Eyes retargeting. -->
+    <div class="column"> <br><br>
+        <h5 style="text-align:center; font-size: medium;">Effect of eyes retargeting</h5><br>
+        <div class="columns is-centered">
+          <video id="dollyzoom4" controls muted playsinline height="100%">
+            <source src="./src/video/retargeting_eyes.mp4"
+                    type="video/mp4">
+          </video>
+        </div>
+    </div>
+    <!--/ Eyes retargeting. -->
+
+    <!-- Eyes retargeting. -->
+    <div class="column"> <br><br>
+      <h5 style="text-align:center; font-size: medium;">Effect of lip retargeting</h5><br>
+      <div class="columns is-centered">
+          <video id="matting-video" controls muted playsinline height="100%">
+            <source src="./src/video/retargeting_lip.mp4"
+                    type="video/mp4">
+          </video>
+      </div>
+    </div>
+  </div>
+  <!--/ Eyes retargeting. -->
+</div>
+
+<div class="content">
+  <h3 style="text-align:center"><strong>🐱🐶 Generalization to Animals 🐼🐱</strong></h3>
+  <p style="text-align:center; font-size: medium;">By fine-tuning on animals data, these cute cats, dogs and pandas can be precisely driven by humans</p>
+  <div class="columns is-centered">
+    <div class="column"> <br>
+        <div class="columns is-centered">
+          <img src="src/video/animal_animation_0.gif">
+        </div>
+    </div>
+
+    <div class="column"> <br>
+      <div class="columns is-centered">
+        <img src="src/video/animal_animation_8.gif">
+      </div>
+    </div>
+
+    <div class="column"> <br>
+      <div class="columns is-centered">
+        <img src="src/video/animal_animation_7.gif">
+      </div>
+    </div>
+
+    <div class="column"> <br>
+      <div class="columns is-centered">
+        <img src="src/video/animal_animation_9.gif">
+      </div>
+    </div>
+    <div class="column"> <br>
+      <div class="columns is-centered">
+        <img src="src/video/animal_animation_12.gif">
+      </div>
+    </div>
+  </div>
+
+  <div class="columns is-centered">
+    <div class="column">
+        <div class="columns is-centered">
+          <img src="src/video/animal_animation_4.gif">
+        </div>
+    </div>
+
+    <div class="column">
+      <div class="columns is-centered">
+        <img src="src/video/animal_animation_5.gif">
+      </div>
+    </div>
+
+    <div class="column">
+      <div class="columns is-centered">
+        <img src="src/video/animal_animation_13.gif">
+      </div>
+    </div>
+
+    <div class="column">
+      <div class="columns is-centered">
+        <img src="src/video/animal_animation_6.gif">
+      </div>
+    </div>
+
+    <div class="column">
+      <div class="columns is-centered">
+        <img src="src/video/animal_animation_10.gif">
+      </div>
+    </div>
+    <div class="column">
+      <div class="columns is-centered">
+        <img src="src/video/animal_animation_11.gif">
+      </div>
+    </div>
+  </div>
+
+
+</div>
+
+<div class="content">
+  <h2 style="text-align:center"><strong>Abstract</strong></h2>
+  <p>
+    <b><span style="color: #f14040dc">Portrait</span> <span style="color: #3792e7e5">Animation</span></b> aims to synthesize a lifelike video from a single source image, using it as an appearance reference, with motion (i.e., facial expressions and head pose) derived from a driving video, audio, text, or generation.
+  </p>
+  <div id="teasers">
+      <img src="./src/img/fig1.jpg", style="display: block; margin: 0 auto; width: 95%;">
+      <figcaption></figcaption>
+  </div>
+  <br>
+  <p>
+    Instead of following mainstream diffusion-based methods, we explore and extend the potential of the implicit-keypoint-based framework, which effectively balances computational efficiency and controllability.
+    Building upon this, we develop a video-driven portrait animation framework named <strong>LivePortrait</strong> with a focus on better generalization, controllability, and efficiency for practical usage.
+    To enhance the generation quality and generalization ability, we scale up the training data to about 69 million high-quality frames, adopt a mixed image-video training strategy, upgrade the network architecture, and design better motion transformation and optimization objectives.
+    Additionally, we discover that compact implicit keypoints can effectively represent a kind of blendshapes and meticulously propose a stitching and two retargeting modules, which utilize a small MLP with negligible computational overhead, to enhance the controllability.
+    Experimental results demonstrate the efficacy of our framework even compared to diffusion-based methods.
+    The generation speed remarkably reaches <strong>12.8ms</strong> on an RTX 4090 GPU with PyTorch.
+    The inference code and models are available at <a href="https://github.com/KwaiVGI/LivePortrait" style="font-weight: bold;">https://github.com/KwaiVGI/LivePortrait</a>.
+  </p>
+</div>
+<div class="content">
+  <h3 style="text-align:center"><strong>Method</strong></h3>
+  <img src="./src/img/pipeline_first_stage.jpg" alt="" style="display: block; margin: 0 auto; width: 70%;">
+  <p>
+    <b>Pipeline of the first stage: base model training.</b>
+    The appearance and motion extractors \(\mathcal{F}\) and \(\mathcal{M}\), the warping module \(\mathcal{W}\), and the decoder \(\mathcal{G}\) are optimized. In this stage, models are trained from scratch. Please see the paper for more details.
+  </p>
+  <img src="./src/img/pipeline_second_stage.jpg" alt="" style="width: 100%;">
+  <p>
+    <b>Pipeline of the second stage: stitching and retargeting modules training.</b>
+    After training the base model in the first stage, we freeze the appearance and motion extractor, warpping module and decoder.
+    Only the stitching module and the retargeting modules are optimized in the second stage. Please see the paper for more details.
+  </p>
+</div>
+
+<style>
+  pre {
+    font-size: 13px; /* 设置字体大小为 14px */
+  }
+</style>
+
+<div class="content">
+  <h3 style="text-align:center; margin: 0 auto;"><strong>BibTeX</strong></h3> <br>
+  <pre><code>@article{guo2024live,
+  title   = {LivePortrait: Efficient Portrait Animation with Stitching and Retargeting Control},
+  author  = {Jianzhu Guo and Dingyun Zhang and Xiaoqiang Liu and Zhizhou Zhong and Yuan Zhang and Pengfei Wan and Di Zhang},
+  year    = {2024},
+  journal = {arXiv preprint:24xx.xxxx},
+}</code></pre>
+</div>
+  <script>
+    var gifImage = document.getElementById('gif-image');
+
+    gifImage.addEventListener('click', function() {
+      if (gifImage.classList.contains('playing')) {
+        gifImage.classList.remove('playing');
+        gifImage.src = gifImage.src;
+      } else {
+        gifImage.classList.add('playing');
+        gifImage.src = gifImage.src;
+      }
+    });
+  </script>
+</body></html>
